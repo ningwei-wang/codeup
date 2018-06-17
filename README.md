@@ -1,2 +1,2 @@
-# hello-world
-about how to study
+# codeup
+to code every day
