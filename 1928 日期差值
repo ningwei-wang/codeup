@@ -1,0 +1,78 @@
+题目描述
+有两个日期，求两个日期之间的天数，如果两个日期是连续的我们规定他们之间的天数为两天。
+
+输入
+有多组数据，每组数据有两行，分别表示两个日期，形式为YYYYMMDD
+
+输出
+每组数据输出一行，即日期差值
+
+样例输入
+20130101
+20130105
+样例输出
+5
+
+```C++
+#include<stdio.h>
+int dayOfMonth[2][13] = {
+{
+	0,31,28,31,30,31,30,31,31,30,31,30,31	
+},{
+	0,31,29,31,30,31,30,31,31,30,31,30,31
+}
+};
+typedef struct{
+	int year;
+	int month;
+	int day;
+} Date;
+int sum;
+int main(){
+//	int i,j,negativeCount,finalIndex,tempA,tempB;
+	Date startDate,endDate;
+	int isPeak = 0,dayCount;
+	int a,b;
+	while(scanf("%d\n%d",&a,&b)!=EOF){
+		if(a>b){
+			startDate.year = b/10000;
+			startDate.month = (b/100)%100;
+			startDate.day = b%100;
+			endDate.year = a/10000;
+			endDate.month = (a/100)%100;
+			endDate.day = a%100;
+		} else{
+			startDate.year = a/10000;
+			startDate.month = (a/100)%100;
+			startDate.day = a%100;
+			endDate.year = b/10000;
+			endDate.month = (b/100)%100;
+			endDate.day = b%100;
+		}
+		dayCount = 1;
+		while(true){
+			if(startDate.year == endDate.year && startDate.month == endDate.month && startDate.day == endDate.day){
+				break;
+			}
+			if((startDate.year % 400 == 0) || ((startDate.year % 4 == 0) && (startDate.year % 100 != 0))){
+				isPeak = 1;
+			}else{
+				isPeak = 0;
+			}
+			startDate.day += 1;
+			if(dayOfMonth[isPeak][startDate.month] < startDate.day){
+				startDate.day = 1;
+				startDate.month += 1;
+				if(startDate.month > 12){
+					startDate.month = 1;
+					startDate.year += 1;
+				}
+			}
+			dayCount += 1;
+		}
+		printf("%d\n",dayCount);
+	}
+
+	return 0;	
+}
+```
