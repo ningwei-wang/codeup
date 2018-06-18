@@ -1,0 +1,208 @@
+题目描述
+给定两个整数A和B，其表示形式是：从个位开始，每三位数用逗号","隔开。
+现在请计算A+B的结果，并以正常形式输出。
+
+输入
+输入包含多组数据数据，每组数据占一行，由两个整数A和B组成（-10^9 < A,B < 10^9）。
+
+输出
+请计算A+B的结果，并以正常形式输出，每组数据占一行。
+
+样例输入
+-234,567,890 123,456,789
+1,234 2,345,678
+样例输出
+-111111101
+2346912
+
+```C++
+#include<stdio.h>
+char a[30],b[30];
+int final[32];
+int min[30],max[30];
+int aArray[30],bArray[30]; 
+int minLength,maxLength;
+int getLength(char c[]){
+	int i=0;
+	while(c[i] != '\0'){
+		i++;	
+	}
+	return i;
+}
+
+int sub(){//大的减小的的绝对值 
+	int lastSum = 0,i=0,temp,finalIndex = 0; 
+	while(i<minLength){
+		temp = max[i] - min[i] - lastSum;
+		if(temp >= 0){
+			lastSum = 0;
+			final[finalIndex] = temp;
+		} else{
+			lastSum = 1;
+			final[finalIndex] = temp + 10;
+		}
+		finalIndex++;
+		i++;
+	}
+	for(;i<maxLength;i++){
+		temp = max[i] - lastSum;
+		if(temp >= 0){
+			lastSum = 0;
+			final[finalIndex] = temp;
+		} else{
+			lastSum = 1;
+			final[finalIndex] = temp + 10;
+		}
+		finalIndex++;
+	}
+//	if((final[finalIndex-1]==0) || (lastSum > 0)){
+//		finalIndex -= 1;
+//	}
+	while(final[finalIndex-1]==0){
+		finalIndex -= 1;
+	}
+	return finalIndex;
+}
+
+int add(){
+	int finalIndex = 0;
+	int lastSum = 0;
+	int i=0,temp;
+	while(i<minLength){
+		temp = min[i] + max[i] + lastSum;
+		if(temp > 9){
+			lastSum = 1;
+			final[finalIndex] = temp - 10;
+			finalIndex += 1; 
+		} else{
+			lastSum = 0;
+			final[finalIndex] = temp;
+			finalIndex += 1;
+		}
+		i++;
+	}
+	for(;i<maxLength;i++){
+		temp = max[i] + lastSum;
+		if(temp > 9){
+			lastSum = 1;
+			final[finalIndex] = temp - 10;
+			finalIndex += 1;
+		} else{
+			lastSum = 0;
+			final[finalIndex] = temp;
+			finalIndex += 1;
+		}
+	}
+	if(lastSum>0){
+		final[finalIndex] = lastSum;
+		finalIndex += 1;
+	}
+	return finalIndex;
+}
+
+bool switchMe(){
+	int aLength,bLength,i,j,k,aIndex,bIndex;
+	bool bIsBig; 
+	aLength=getLength(a);
+	bLength=getLength(b);
+	aIndex=0;
+	for(i=aLength-1;i>=0;i--){
+		if((a[i] != '-') && (a[i] != ',')){
+			aArray[aIndex] = a[i] - '0';
+			aIndex += 1;
+		}
+
+	}
+	bIndex=0;
+	for(i=bLength-1;i>=0;i--){
+		if((b[i] != '-') && (b[i] != ',')){
+			bArray[bIndex] = b[i] - '0';
+			bIndex += 1;
+		}
+	
+	}
+	//现在认为两者都是正数,再比较两者的大小
+	if(bIndex > aIndex){
+		bIsBig = true;	
+	} else if(bIndex == aIndex){
+		for(i=aIndex-1;i>=0;i--){
+			if(aArray[i] > bArray[i]){
+				bIsBig = false;
+				break;
+			} else if( aArray[i] < bArray[i]){
+				bIsBig = true;
+				break;
+			}
+		}
+		if(i<0)
+			bIsBig = true;
+			
+	} else{
+		bIsBig = false;
+	}
+	if(bIsBig){
+		//max = bArray;
+		for(i=0;i<bIndex;i++){
+			max[i] = bArray[i];
+		}
+		//min = aArray;
+		for(i=0;i<aIndex;i++){
+			min[i] = aArray[i];
+		}
+		maxLength = bIndex;
+		minLength = aIndex;
+	} else{
+		//max = aArray;
+		for(i=0;i<aIndex;i++){
+			max[i] = aArray[i];
+		}
+		//min = bArray;
+		for(i=0;i<bIndex;i++){
+			min[i] = bArray[i];
+		}
+		maxLength = aIndex;
+		minLength = bIndex;
+	}
+	return bIsBig;
+}
+int main(){
+	int i,j,negativeCount,finalIndex;
+	bool bIsBig;
+	
+	while(scanf("%s%s",a,b)!=EOF){
+		negativeCount=0;
+		if(a[0]=='-')
+			negativeCount++;
+		if(b[0]=='-')
+			negativeCount++;
+		bIsBig = switchMe();
+		if(negativeCount == 0){ //加 
+			finalIndex = add();
+			
+		} else if(negativeCount == 1){//一正一负，符号是大的 
+			finalIndex = sub();
+			if(a[0]=='-'){
+				if(bIsBig){
+				} else{
+					printf("-");
+				}
+			} else{
+				if(bIsBig){
+					printf("-");
+				} else{
+				}
+			}
+		} else{
+			finalIndex = add();
+			printf("-");
+		}
+		if(finalIndex<=0){
+			printf("0");
+		}
+		for(i=finalIndex-1;i>=0;i--)
+			printf("%d",final[i]);
+		printf("\n");
+	}
+	return 0;	
+}
+```
